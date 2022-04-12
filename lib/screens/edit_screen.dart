@@ -30,18 +30,19 @@ class _EditScreenState extends State<EditScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    if(widget.status == EditStatus.ADD){
+    if (widget.status == EditStatus.ADD) {
       _textTitle = "新しい単語の追加";
       questionController.text = "";
       answerController.text = "";
       _isQuestionEnabled = true;
-    }else{
+    } else {
       _textTitle = "登録した単語の修正";
       questionController.text = widget.word!.strQuestion;
       answerController.text = widget.word!.strAnswer;
       _isQuestionEnabled = false;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -53,7 +54,7 @@ class _EditScreenState extends State<EditScreen> {
           actions: [
             IconButton(
               tooltip: "登録",
-              onPressed: () => _onWordRegisterd(),
+              onPressed: () => _onWordRegistered(),
               icon: const Icon(Icons.done),
             ),
           ],
@@ -147,8 +148,10 @@ class _EditScreenState extends State<EditScreen> {
     }
     try {
       var word = Word(
-          strQuestion: questionController.text,
-          strAnswer: answerController.text);
+        strQuestion: questionController.text,
+        strAnswer: answerController.text,
+        isMemorized: false,
+      );
       await database.addWord(word);
       questionController.clear();
       answerController.clear();
@@ -166,15 +169,15 @@ class _EditScreenState extends State<EditScreen> {
     }
   }
 
-  _onWordRegisterd() {
-    if(widget.status == EditStatus.ADD){
+  _onWordRegistered() {
+    if (widget.status == EditStatus.ADD) {
       _insertWord();
-    }else{
+    } else {
       _updateWord();
     }
   }
 
-  _updateWord() async{
+  _updateWord() async {
     if (questionController.text == "" || answerController.text == "") {
       Fluttertoast.showToast(
         msg: "問題と答えの両方を入力しないと登録できません",
@@ -185,8 +188,10 @@ class _EditScreenState extends State<EditScreen> {
     }
     try {
       var word = Word(
-          strQuestion: questionController.text,
-          strAnswer: answerController.text);
+        strQuestion: questionController.text,
+        strAnswer: answerController.text,
+        isMemorized: false,
+      );
       await database.updateWord(word);
       _backWordListScreen();
     } on SqliteException catch (e) {
